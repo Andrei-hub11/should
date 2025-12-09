@@ -449,6 +449,76 @@ func TestBeEqual_TypeDifferences(t *testing.T) {
 				"└─ : int ≠ ptr",
 			},
 		},
+		{
+			name: "struct with different slice lengths",
+			actual: struct {
+				Name   string
+				Ages   []int
+				Scores []float64
+			}{
+				Name:   "João",
+				Ages:   []int{10, 20, 30},
+				Scores: []float64{8.5, 9},
+			},
+			expected: struct {
+				Name   string
+				Ages   []int
+				Scores []float64
+			}{
+				Name:   "João",
+				Ages:   []int{10, 20},
+				Scores: []float64{8.5, 9},
+			},
+			wantTypeInfo: true,
+			expectedContent: []string{
+				"Not equal:",
+				`expected: {Name: "João", Ages: [10, 20], Scores: [8.5, 9]}`,
+				`actual  : {Name: "João", Ages: [10, 20, 30], Scores: [8.5, 9]}`,
+				"└─ Ages: length mismatch (expected: 2, actual: 3)",
+			},
+		},
+		{
+			name: "struct with slice length difference and value difference",
+			actual: struct {
+				Name   string
+				Ages   []int
+				Scores []float64
+			}{
+				Name:   "João",
+				Ages:   []int{10, 20, 30},
+				Scores: []float64{8.5, 9.5, 7.0},
+			},
+			expected: struct {
+				Name   string
+				Ages   []int
+				Scores []float64
+			}{
+				Name:   "Maria",
+				Ages:   []int{10, 20},
+				Scores: []float64{8.5, 9.0, 7.0},
+			},
+			wantTypeInfo: true,
+			expectedContent: []string{
+				"Not equal:",
+				`expected: {Name: "Maria", Ages: [10, 20], Scores: [8.5, 9, 7]}`,
+				`actual  : {Name: "João", Ages: [10, 20, 30], Scores: [8.5, 9.5, 7]}`,
+				"└─ Name: \"Maria\" ≠ \"João\"",
+				"└─ Ages: length mismatch (expected: 2, actual: 3)",
+				"└─ Scores.[1]: 9 ≠ 9.5",
+			},
+		},
+		{
+			name:         "slice length mismatch",
+			actual:       []int{1, 2, 3},
+			expected:     []int{1, 2},
+			wantTypeInfo: true,
+			expectedContent: []string{
+				"Not equal:",
+				"expected: [1, 2]",
+				"actual  : [1, 2, 3]",
+				"└─ : length mismatch (expected: 2, actual: 3)",
+			},
+		},
 	}
 
 	for _, tt := range tests {
