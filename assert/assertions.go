@@ -1029,6 +1029,7 @@ func AnyMatch[T any](t testing.TB, actual []T, predicate func(T) bool, opts ...O
 // This assertion checks if the actual string starts with the expected substring.
 // It provides a detailed error message showing the expected and actual strings,
 // along with a note if the case mismatch is detected.
+// The expected prefix must be non-empty.
 //
 // Example:
 //
@@ -1044,7 +1045,17 @@ func StartWith(t testing.TB, actual string, expected string, opts ...Option) {
 
 	cfg := processOptions(opts...)
 
-	if actual == expected || (cfg.IgnoreCase && strings.HasPrefix(strings.ToLower(actual), strings.ToLower(expected))) {
+	if expected == "" {
+		failWithOptions(t, cfg, "StartWith requires a non-empty expected prefix")
+		return
+	}
+
+	hasPrefix := strings.HasPrefix(actual, expected)
+	if !hasPrefix && cfg.IgnoreCase {
+		hasPrefix = strings.HasPrefix(strings.ToLower(actual), strings.ToLower(expected))
+	}
+
+	if actual == expected || hasPrefix {
 		return
 	}
 
@@ -1068,14 +1079,10 @@ func StartWith(t testing.TB, actual string, expected string, opts ...Option) {
 		actual = "<empty>"
 	}
 
-	if strings.TrimSpace(expected) == "" {
-		expected = "<empty>"
-	}
-
 	actual = truncateHead(actual, displayMaxRunes)
 	expected = truncateHead(expected, displayMaxRunes)
 
-	errorMsg := formatStartsWithError(actual, expected, startWith, noteMsg, cfg)
+	errorMsg := formatStartsWithError(actual, expected, startWith, noteMsg)
 	if errorMsg != "" {
 		failWithOptions(t, cfg, errorMsg)
 	}
@@ -1086,6 +1093,7 @@ func StartWith(t testing.TB, actual string, expected string, opts ...Option) {
 // This assertion checks if the actual string ends with the expected substring.
 // It provides a detailed error message showing the expected and actual strings,
 // along with a note if the case mismatch is detected.
+// The expected suffix must be non-empty.
 //
 // Example:
 //
@@ -1101,18 +1109,14 @@ func EndWith(t testing.TB, actual string, expected string, opts ...Option) {
 
 	cfg := processOptions(opts...)
 
-	// --- Logic checks on the original strings ---
-	// An empty suffix matches everything mathematically, but like StartWith with an
-	// empty prefix, we treat it as a likely programming mistake and fall through to
-	// the error path. Only a genuine suffix (non-empty) earns an early return.
-	// Exact match ("" == "") is always valid and returns immediately.
-	if actual == expected {
+	if expected == "" {
+		failWithOptions(t, cfg, "EndWith requires a non-empty expected suffix")
 		return
 	}
-	if expected != "" && strings.HasSuffix(actual, expected) {
-		return
-	}
-	if expected != "" && cfg.IgnoreCase && strings.HasSuffix(strings.ToLower(actual), strings.ToLower(expected)) {
+
+	if actual == expected ||
+		strings.HasSuffix(actual, expected) ||
+		(cfg.IgnoreCase && strings.HasSuffix(strings.ToLower(actual), strings.ToLower(expected))) {
 		return
 	}
 
@@ -1125,11 +1129,10 @@ func EndWith(t testing.TB, actual string, expected string, opts ...Option) {
 	// Extract the actual trailing runes for display (rune-aware, before truncation).
 	actualRunes := []rune(actual)
 	expectedRunes := []rune(expected)
-	var actualEndSuffix string
+	actualEndSuffix := actual
+
 	if len(actualRunes) > len(expectedRunes) {
 		actualEndSuffix = string(actualRunes[len(actualRunes)-len(expectedRunes):])
-	} else {
-		actualEndSuffix = actual
 	}
 
 	// --- Display string preparation ---
@@ -1137,16 +1140,12 @@ func EndWith(t testing.TB, actual string, expected string, opts ...Option) {
 		actual = "<empty>"
 	}
 
-	if strings.TrimSpace(expected) == "" {
-		expected = "<empty>"
-	}
-
 	// For suffix assertions: show the tail of actual (where the suffix would appear)
 	// and the start of expected (the full pattern the caller typed).
 	actual = truncateTail(actual, displayMaxRunes)
 	expected = truncateHead(expected, displayMaxRunes)
 
-	errorMsg := formatEndsWithError(actual, expected, actualEndSuffix, noteMsg, cfg)
+	errorMsg := formatEndsWithError(actual, expected, actualEndSuffix, noteMsg)
 	if errorMsg != "" {
 		failWithOptions(t, cfg, errorMsg)
 	}
