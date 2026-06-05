@@ -55,7 +55,7 @@ func WithMessagef(message string, args ...any) Option {
 // WithIgnoreCase returns an option that makes string comparisons case-insensitive.
 //
 // This option can be passed to assertions that perform string comparisons,
-// such as StartWith and EndWith, to ensure that case differences are ignored.
+// such as [StartWith] and [EndWith], to ensure that case differences are ignored.
 //
 // Example:
 //
@@ -65,7 +65,7 @@ func WithIgnoreCase() Option {
 	return assert.WithIgnoreCase()
 }
 
-// WithStackTrace creates an option for including stack traces on NotPanic assertions.
+// WithStackTrace creates an option for including stack traces on [NotPanic] assertions.
 //
 // Example:
 //
@@ -78,7 +78,7 @@ func WithStackTrace() Option {
 
 // WithIgnoreTimezone returns an option that makes time comparisons ignore timezone/location differences.
 //
-// Currently, this option is only supported by BeSameTime.
+// Currently, this option is only supported by [BeSameTime].
 //
 // Example:
 //
@@ -216,7 +216,7 @@ func NotBeNil(t testing.TB, actual any, opts ...Option) {
 // This assertion is useful to ensure that a function call actually
 // produced an error when one is expected. It provides clear failure
 // messages showing when an error was expected but not returned.
-// It supports optional custom error messages through Option.
+// It supports optional custom error messages through [Option].
 //
 // Example:
 //
@@ -230,7 +230,7 @@ func BeError(t testing.TB, err error, opts ...Option) {
 // NotBeError - no error required
 //
 // Verifies that err is nil, ensuring successful operation.
-// Supports optional custom error messages via Option.
+// Supports optional custom error messages via [Option].
 //
 // Example:
 //
@@ -248,7 +248,7 @@ func NotBeError(t testing.TB, err error, opts ...Option) {
 //
 // This assertion is useful when you need to verify that an error
 // can be unwrapped into a specific type, such as a custom error struct.
-// It supports optional custom error messages through Option.
+// It supports optional custom error messages through [Option].
 //
 // Example:
 //
@@ -265,7 +265,7 @@ func BeErrorAs(t testing.TB, err error, target interface{}, opts ...Option) {
 //
 // This assertion is useful to check if an error matches a specific sentinel
 // value, such as io.EOF or custom exported error variables.
-// It supports optional custom error messages through Option.
+// It supports optional custom error messages through [Option].
 //
 // Example:
 //
@@ -280,7 +280,7 @@ func BeErrorIs(t testing.TB, err error, target error, opts ...Option) {
 //
 // This assertion works with all numeric types and provides detailed
 // error messages showing the actual value, threshold, difference, and helpful hints.
-// It supports optional custom error messages through Option.
+// It supports optional custom error messages through [Option].
 //
 // Example:
 //
@@ -300,7 +300,7 @@ func BeGreaterThan[T assert.Ordered](t testing.TB, actual T, expected T, opts ..
 //
 // This assertion works with all numeric types and provides detailed
 // error messages showing the actual value, threshold, difference, and helpful hints.
-// It supports optional custom error messages through Option.
+// It supports optional custom error messages through [Option].
 //
 // Example:
 //
@@ -319,7 +319,7 @@ func BeLessThan[T assert.Ordered](t testing.TB, actual T, expected T, opts ...Op
 // BeGreaterOrEqualTo reports a test failure if the value is not greater than or equal to the expected threshold.
 //
 // This assertion works with all numeric types and provides
-// detailed error messages when the assertion fails. It supports optional custom error messages through Option.
+// detailed error messages when the assertion fails. It supports optional custom error messages through [Option].
 //
 // Example:
 //
@@ -338,7 +338,7 @@ func BeGreaterOrEqualTo[T assert.Ordered](t testing.TB, actual T, expected T, op
 // BeLessOrEqualTo reports a test failure if the value is not less than or equal to the expected threshold.
 //
 // This assertion works with all numeric types and provides
-// detailed error messages when the assertion fails. It supports optional custom error messages through Option.
+// detailed error messages when the assertion fails. It supports optional custom error messages through [Option].
 //
 // Example:
 //
@@ -360,7 +360,7 @@ func BeLessOrEqualTo[T assert.Ordered](t testing.TB, actual T, expected T, opts 
 // error messages when the assertion fails. It is especially useful for testing
 // floating-point numbers where exact equality is unreliable due to precision issues.
 //
-// An optional custom error message can be provided using WithMessage.
+// An optional custom error message can be provided using [WithMessage].
 //
 // Example:
 //
@@ -532,7 +532,7 @@ func AnyMatch[T any](t testing.TB, actual []T, predicate func(T) bool, opts ...O
 //
 //	should.StartWith(t, "Hello, world!", "world", should.WithMessage("Expected string to start with 'world'"))
 //
-// Note: The assertion is case-sensitive by default. Use should.WithIgnoreCase() to ignore case.
+// Note: The assertion is case-sensitive by default. Use [WithIgnoreCase] to ignore case.
 func StartWith(t testing.TB, actual string, expected string, opts ...Option) {
 	t.Helper()
 	assert.StartWith(t, actual, expected, opts...)
@@ -553,7 +553,7 @@ func StartWith(t testing.TB, actual string, expected string, opts ...Option) {
 //
 //	should.EndWith(t, "Hello, world!", "world", should.WithMessage("Expected string to end with 'world'"))
 //
-// Note: The assertion is case-sensitive by default. Use should.WithIgnoreCase() to ignore case.
+// Note: The assertion is case-sensitive by default. Use [WithIgnoreCase] to ignore case.
 func EndWith(t testing.TB, actual string, expected string, opts ...Option) {
 	t.Helper()
 	assert.EndWith(t, actual, expected, opts...)
@@ -574,7 +574,7 @@ func EndWith(t testing.TB, actual string, expected string, opts ...Option) {
 //
 //	should.ContainSubstring(t, longText, "keyword", should.WithMessage("Expected keyword to be present"))
 //
-// Note: The assertion is case-sensitive by default. Use should.WithIgnoreCase() to ignore case.
+// Note: The assertion is case-sensitive by default. Use [WithIgnoreCase] to ignore case.
 func ContainSubstring(t testing.TB, actual string, substring string, opts ...Option) {
 	t.Helper()
 	assert.ContainSubstring(t, actual, substring, opts...)
@@ -584,7 +584,7 @@ func ContainSubstring(t testing.TB, actual string, substring string, opts ...Opt
 //
 // This assertion executes the provided function and expects it to panic.
 // It captures and recovers from the panic to prevent the test from crashing.
-// Supports optional custom error messages through Option.
+// Supports optional custom error messages through [Option].
 //
 // Example:
 //
@@ -606,7 +606,7 @@ func Panic(t testing.TB, fn func(), opts ...Option) {
 //
 // This assertion executes the provided function and expects it to complete normally
 // without panicking. If a panic occurs, it captures the panic value and includes it
-// in the error message. Supports optional custom error messages through Option.
+// in the error message. Supports optional custom error messages through [Option].
 //
 // Example:
 //
@@ -619,7 +619,7 @@ func Panic(t testing.TB, fn func(), opts ...Option) {
 //		user.Save()
 //	}, should.WithMessage("Save operation should not panic"))
 //
-// Note: Stack trace is not available when should.WithStackTrace() is not used
+// Note: Stack trace is only available when [WithStackTrace] is used
 //
 // The function parameter must not be nil.
 func NotPanic(t testing.TB, fn func(), opts ...Option) {
@@ -642,14 +642,14 @@ func HaveLength(t testing.TB, actual any, expected int, opts ...Option) {
 	assert.HaveLength(t, actual, expected, opts...)
 }
 
-// BeSameTime reports a test failure if two `time.Time` values do not represent the same time.
+// BeSameTime reports a test failure if two [time.Time] values do not represent the same time.
 //
 // By default, the comparison is timezone-sensitive and nanosecond-precise. You can customize
 // the behavior with functional options:
 //
-// - should.WithIgnoreTimezone(): compares the instants regardless of the timezone/location
+// - [WithIgnoreTimezone] compares the instants regardless of the timezone/location
 //
-// - should.WithTruncate(unit): truncates both times to the specified precision before comparison
+// - [WithTruncate] truncates both times to the specified precision before comparison
 //
 // Example:
 //
