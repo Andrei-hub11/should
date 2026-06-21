@@ -98,19 +98,19 @@ func WithIgnoreCase() Option {
 	return ignoreCase(true)
 }
 
-// WithStackTrace creates an option for including stack traces on NotPanic assertions.
+// WithStackTrace creates an option for including stack traces on [NotPanic] assertions.
 func WithStackTrace() Option {
 	return stackTrace(true)
 }
 
-// WithIgnoreTimezone creates an option for ignoring timezone when comparing times.
+// WithIgnoreTimezone creates an option for ignoring timezone when comparing times in [BeSameTime].
 // When enabled, comparisons use calendar components (year, month, day, hour, minute, second[, ns])
 // and do not consider the Location/offset.
 func WithIgnoreTimezone() Option {
 	return ignoreTimezone(true)
 }
 
-// WithTruncate truncates the actual and expected times to the specified unit before comparing.
+// WithTruncate truncates the actual and expected times to the specified unit before comparing them in [BeSameTime].
 //
 // This is useful for asserting that two times are the same up to a certain level of precision,
 // ignoring differences in smaller units.
