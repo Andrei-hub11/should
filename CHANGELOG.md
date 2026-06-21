@@ -1,3 +1,29 @@
+## [0.2.3] - 2026-06-21
+
+### Bug Fixes
+
+- Correct spelling and formatting in README examples and assertion messages
+- Align public wrappers with assert package
+- Correct EndWith suffix matching and displayed suffix excerpts
+- Unify truncation markers in string assertion error messages
+
+### Refactor
+
+- Improve StartWith and EndWith truncation and case-check handling
+
+### Miscellaneous Tasks
+
+- Add commit message validation workflow, hook script, and Bats coverage
+- Upgrade GitHub Actions to Node.js 24 compatible versions
+
+### Documentation
+
+- Normalize Go doc links
+
+### Testing
+
+- Add wrapper parity tests for the public assertion API
+
 ## [0.2.0] - 2025-09-13
 
 ### Features
