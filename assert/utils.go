@@ -405,36 +405,65 @@ func buildPath(parent, field string) string {
 // Otherwise, it shows up to 5 initial lines (56 chars each), and if longer,
 // appends the last 3 lines for context.
 func formatMultilineString(s string) string {
-	if len(s) < 280 {
+	const (
+		// byteThreshold: shorter strings are shown verbatim; longer ones get the
+		// truncated multi-line summary below.
+		byteThreshold = 280
+		// lineWidth: characters per preview line.
+		lineWidth = 56
+		// headLines / tailLines: how many leading and trailing lines to show.
+		headLines = 5
+		tailLines = 3
+	)
+
+	if len(s) < byteThreshold {
 		return s
 	}
 
+	// Work in runes, not bytes: slicing on byte offsets can cut through a
+	// multi-byte UTF-8 sequence and emit U+FFFD replacement characters, and
+	// len(s) would report the byte count where the header promises characters.
+	// This preserves whole code points, not whole grapheme clusters: an emoji
+	// ZWJ sequence or a base+combining-mark pair can still be split between
+	// runes. Grapheme-aware segmentation is out of scope for an error preview
+	// and would need a Unicode segmentation dependency.
+	runes := []rune(s)
+	totalRunes := len(runes)
+
 	builder := strings.Builder{}
 
-	totalLine := len(s) / 56
+	totalLine := totalRunes / lineWidth
 
 	builder.WriteString("Length: ")
-	builder.WriteString(fmt.Sprintf("%d", len(s)))
+	builder.WriteString(fmt.Sprintf("%d", totalRunes))
 	builder.WriteString(" characters, ")
 	builder.WriteString(fmt.Sprintf("%d lines", totalLine))
 	builder.WriteString("\n")
 
-	// max 5 lines and 56 characters per line
-	for i := range 5 {
+	// writeLine appends the 1-indexed preview line that starts at rune i*lineWidth,
+	// clamped to the end of the string. Lines whose start is past the end are
+	// skipped, so a string of N runes that is fewer than headLines lines long
+	// stops cleanly without indexing past the slice.
+	writeLine := func(i int) {
+		start := i * lineWidth
+		if start >= totalRunes {
+			return
+		}
 		builder.WriteString(fmt.Sprintf("%d. ", i+1))
-		builder.WriteString(s[i*56 : min(i*56+56, len(s))])
+		builder.WriteString(string(runes[start:min(start+lineWidth, totalRunes)]))
 		builder.WriteString("\n")
 	}
 
-	if totalLine > 5 {
+	for i := range headLines {
+		writeLine(i)
+	}
+
+	if totalLine > headLines {
 		builder.WriteString("\n")
 		builder.WriteString("Last lines:\n")
 
-		// print last 3 lines
-		for i := totalLine - 3; i < totalLine; i++ {
-			builder.WriteString(fmt.Sprintf("%d. ", i+1))
-			builder.WriteString(s[i*56 : min(i*56+56, len(s))])
-			builder.WriteString("\n")
+		for i := totalLine - tailLines; i < totalLine; i++ {
+			writeLine(i)
 		}
 	}
 
